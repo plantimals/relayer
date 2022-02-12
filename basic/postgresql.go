@@ -11,7 +11,7 @@ import (
 
 func initDBRetry(dburl string, count int) (*sqlx.DB, error) {
 	db, err := initDB(dburl)
-	retryCount := 30
+	retryCount := count
 	for {
 		err := db.Ping()
 		if err != nil {

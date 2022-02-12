@@ -25,7 +25,7 @@ func (b *BasicRelay) Init() error {
 		return fmt.Errorf("couldn't process envconfig: %w", err)
 	}
 
-	if db, err := initDB(b.PostgresDatabase); err != nil {
+	if db, err := initDBRetry(b.PostgresDatabase, 30); err != nil {
 		return fmt.Errorf("failed to open database: %w", err)
 	} else {
 		db.Mapper = reflectx.NewMapperFunc("json", sqlx.NameMapper)
