@@ -1,10 +1,37 @@
 package main
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
 	"github.com/rs/zerolog/log"
 )
+
+func initDBRetry(dburl string, count int) (*sqlx.DB, error) {
+	db, err := initDB(dburl)
+	retryCount := 30
+	for {
+		err := db.Ping()
+		if err != nil {
+			if retryCount == 0 {
+				log.Fatal().Msgf("Not able to establish connection to database %s", dburl)
+			}
+
+			log.Printf(fmt.Sprintf("Could not connect to database. Wait 2 seconds. %d retries left...", retryCount))
+			retryCount--
+			time.Sleep(2 * time.Second)
+		} else {
+			db, err = initDB(dburl)
+			if err != nil {
+				log.Fatal().Msgf("Not able to establish connection to database %s", dburl)
+			}
+			break
+		}
+	}
+	return db, err
+}
 
 func initDB(dburl string) (*sqlx.DB, error) {
 	db, err := sqlx.Connect("postgres", dburl)
