@@ -13,7 +13,6 @@ func initDBRetry(dburl string, count int) (*sqlx.DB, error) {
 	db, err := initDB(dburl)
 	retryCount := count
 	for {
-		err := db.Ping()
 		if err != nil {
 			if retryCount == 0 {
 				log.Fatal().Msgf("Not able to establish connection to database %s", dburl)
@@ -29,6 +28,7 @@ func initDBRetry(dburl string, count int) (*sqlx.DB, error) {
 			}
 			break
 		}
+		db, err = initDB(dburl)
 	}
 	return db, err
 }
