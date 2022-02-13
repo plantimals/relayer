@@ -55,6 +55,7 @@ func handleWebsocket(relay Relay) func(http.ResponseWriter, *http.Request) {
 				conn.SetReadDeadline(time.Now().Add(pongWait))
 				return nil
 			})
+			log.Info().Msg("start reader")
 
 			for {
 				typ, message, err := conn.ReadMessage()
